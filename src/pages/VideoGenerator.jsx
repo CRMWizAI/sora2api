@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Sparkles, History, Plus, X } from 'lucide-react';
+import { Sparkles, History, Plus, X, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 
@@ -323,7 +323,7 @@ export default function VideoGenerator() {
                                                     />
                                                     <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                                                         <div className="w-12 h-12 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center">
-                                                            <div className="w-0 h-0 border-l-8 border-l-white border-t-6 border-t-transparent border-b-6 border-b-transparent ml-1" />
+                                                            <Play className="w-6 h-6 text-white fill-white" />
                                                         </div>
                                                     </div>
                                                 </div>
