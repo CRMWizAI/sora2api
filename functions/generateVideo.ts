@@ -206,13 +206,19 @@ Deno.serve(async (req) => {
                     console.log('[DEBUG] Content download response status:', contentResponse.status);
 
                     if (contentResponse.ok) {
-                        const videoBlob = await contentResponse.blob();
-                        console.log('[DEBUG] Video downloaded, size:', videoBlob.size, 'bytes');
+                        const videoArrayBuffer = await contentResponse.arrayBuffer();
+                        console.log('[DEBUG] Video downloaded, size:', videoArrayBuffer.byteLength, 'bytes');
                         
                         // Upload video to Base44 storage
                         console.log('[DEBUG] Uploading video to Base44 storage...');
+                        
+                        // Create a File object from the video data
+                        const videoBlob = new Blob([videoArrayBuffer], { type: 'video/mp4' });
+                        const videoFile = new File([videoBlob], `generated-video-${Date.now()}.mp4`, { type: 'video/mp4' });
+                        console.log('[DEBUG] Created video file:', videoFile.name, videoFile.size, videoFile.type);
+                        
                         const { file_url } = await base44.asServiceRole.integrations.Core.UploadFile({ 
-                            file: videoBlob 
+                            file: videoFile
                         });
                         console.log('[DEBUG] Video uploaded to:', file_url);
 
