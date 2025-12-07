@@ -29,17 +29,17 @@ export default function VideoPreview({ videoUrl, prompt }) {
             className="space-y-6"
         >
             {/* Video Player */}
-            <div className="relative rounded-3xl overflow-hidden bg-black border border-white/20 shadow-2xl">
+            <div className="relative rounded-3xl overflow-hidden bg-black border border-white/20 shadow-2xl max-w-2xl mx-auto">
                 <video
                     src={videoUrl}
                     controls
                     autoPlay
                     loop
-                    className="w-full h-auto"
+                    className="w-full h-auto max-h-[600px]"
                 >
                     Your browser does not support video playback.
                 </video>
-                
+
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             </div>

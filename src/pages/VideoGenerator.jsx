@@ -308,11 +308,19 @@ export default function VideoGenerator() {
                                             className="bg-white/5 backdrop-blur-sm border-white/20 overflow-hidden hover:bg-white/10 transition-all"
                                         >
                                             {gen.status === 'completed' && gen.video_url ? (
-                                                <video
-                                                    src={gen.video_url}
-                                                    className="w-full h-48 object-cover"
-                                                    muted
-                                                />
+                                                <div className="relative w-full h-48 bg-black">
+                                                    <video
+                                                        src={gen.video_url}
+                                                        className="w-full h-full object-contain"
+                                                        muted
+                                                        preload="metadata"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                                        <div className="w-12 h-12 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center">
+                                                            <div className="w-0 h-0 border-l-8 border-l-white border-t-6 border-t-transparent border-b-6 border-b-transparent ml-1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             ) : (
                                                 <div className="w-full h-48 bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
                                                     <Sparkles className="w-12 h-12 text-white/40" />
@@ -326,7 +334,7 @@ export default function VideoGenerator() {
                                                     <span>{gen.aspect_ratio}</span>
                                                     <span>{format(new Date(gen.created_date), 'MMM d, yyyy')}</span>
                                                 </div>
-                                                {gen.status === 'completed' && (
+                                                {gen.status === 'completed' && gen.video_url ? (
                                                     <Button
                                                         onClick={() => {
                                                             const a = document.createElement('a');
@@ -339,7 +347,15 @@ export default function VideoGenerator() {
                                                     >
                                                         Download
                                                     </Button>
-                                                )}
+                                                ) : gen.status === 'processing' ? (
+                                                    <div className="text-center text-white/60 text-sm py-2">
+                                                        Processing...
+                                                    </div>
+                                                ) : gen.status === 'failed' ? (
+                                                    <div className="text-center text-red-400 text-sm py-2">
+                                                        Failed
+                                                    </div>
+                                                ) : null}
                                             </div>
                                         </Card>
                                     ))}
