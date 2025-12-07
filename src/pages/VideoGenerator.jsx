@@ -345,8 +345,8 @@ export default function VideoGenerator() {
                                                         <Button
                                                             onClick={() => setPreviewVideo(gen)}
                                                             size="sm"
-                                                            variant="outline"
-                                                            className="flex-1 border-white/20 text-white hover:bg-white/10"
+                                                            variant="ghost"
+                                                            className="flex-1 border border-white/20 text-white hover:bg-white/10"
                                                         >
                                                             Preview
                                                         </Button>
