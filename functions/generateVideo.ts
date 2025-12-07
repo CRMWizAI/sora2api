@@ -47,9 +47,23 @@ Deno.serve(async (req) => {
                     if (!imageResponse.ok) {
                         throw new Error(`Failed to fetch image: ${imageResponse.status}`);
                     }
-                    const imageBlob = await imageResponse.blob();
-                    console.log('[DEBUG] Image fetched, size:', imageBlob.size, 'bytes, type:', imageBlob.type);
-                    formData.append('input_reference', imageBlob, 'reference.jpg');
+                    
+                    // Get content type from response
+                    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
+                    console.log('[DEBUG] Image content type:', contentType);
+                    
+                    const imageArrayBuffer = await imageResponse.arrayBuffer();
+                    console.log('[DEBUG] Image fetched, size:', imageArrayBuffer.byteLength, 'bytes');
+                    
+                    // Create blob with proper MIME type
+                    const imageBlob = new Blob([imageArrayBuffer], { type: contentType });
+                    console.log('[DEBUG] Created blob with type:', imageBlob.type);
+                    
+                    // Determine file extension
+                    const extension = contentType.includes('png') ? 'png' : 
+                                     contentType.includes('webp') ? 'webp' : 'jpg';
+                    
+                    formData.append('input_reference', imageBlob, `reference.${extension}`);
                 } catch (imageError) {
                     console.error('[ERROR] Failed to fetch image:', imageError);
                     return Response.json({ 
