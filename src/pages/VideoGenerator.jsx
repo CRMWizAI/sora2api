@@ -192,7 +192,7 @@ export default function VideoGenerator() {
                                             config={config}
                                             onChange={setConfig}
                                             onGenerate={handleGenerate}
-                                            disabled={!imageUrl}
+                                            disabled={false}
                                             showOnlyFormat={true}
                                         />
                                     </div>
