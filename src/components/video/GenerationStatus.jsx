@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, CheckCircle, XCircle, Sparkles } from 'lucide-react';
 
-export default function GenerationStatus({ status, error }) {
+export default function GenerationStatus({ status, error, progress }) {
     const statusConfig = {
         processing: {
             icon: Loader2,
@@ -69,15 +69,19 @@ export default function GenerationStatus({ status, error }) {
                     </p>
                 </div>
 
-                {/* Progress Animation */}
+                {/* Progress Bar */}
                 {config.spin && (
-                    <div className="w-full max-w-md">
+                    <div className="w-full max-w-md space-y-2">
                         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                             <motion.div
-                                animate={{ x: ['-100%', '100%'] }}
-                                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                                className="h-full w-1/3 bg-gradient-to-r from-transparent via-purple-500 to-transparent"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progress || 0}%` }}
+                                transition={{ duration: 0.5 }}
+                                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
                             />
+                        </div>
+                        <div className="text-center text-white/60 text-sm">
+                            {progress ? `${Math.round(progress)}%` : 'Starting...'}
                         </div>
                     </div>
                 )}

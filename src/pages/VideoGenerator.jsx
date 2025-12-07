@@ -3,7 +3,8 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
-import { Sparkles, History, Plus } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Sparkles, History, Plus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 
@@ -24,6 +25,7 @@ export default function VideoGenerator() {
     const [currentGeneration, setCurrentGeneration] = useState(null);
     const [history, setHistory] = useState([]);
     const [loadingHistory, setLoadingHistory] = useState(false);
+    const [previewVideo, setPreviewVideo] = useState(null);
 
     useEffect(() => {
         loadHistory();
@@ -89,13 +91,14 @@ export default function VideoGenerator() {
                 generationId: currentGeneration.id
             });
 
-            const { status, video_url, error_message } = response.data;
+            const { status, video_url, error_message, progress } = response.data;
 
             setCurrentGeneration({
                 ...currentGeneration,
                 status,
                 video_url,
-                error_message
+                error_message,
+                progress: progress || 0
             });
 
             if (status === 'completed' || status === 'failed') {
@@ -231,7 +234,7 @@ export default function VideoGenerator() {
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                 >
-                                    <GenerationStatus status="processing" />
+                                    <GenerationStatus status="processing" progress={currentGeneration?.progress || 0} />
                                 </motion.div>
                             ) : currentGeneration?.status === 'completed' ? (
                                 <motion.div
@@ -308,7 +311,10 @@ export default function VideoGenerator() {
                                             className="bg-white/5 backdrop-blur-sm border-white/20 overflow-hidden hover:bg-white/10 transition-all"
                                         >
                                             {gen.status === 'completed' && gen.video_url ? (
-                                                <div className="relative w-full h-48 bg-black">
+                                                <div 
+                                                    className="relative w-full h-48 bg-black cursor-pointer"
+                                                    onClick={() => setPreviewVideo(gen)}
+                                                >
                                                     <video
                                                         src={gen.video_url}
                                                         className="w-full h-full object-contain"
@@ -335,18 +341,28 @@ export default function VideoGenerator() {
                                                     <span>{format(new Date(gen.created_date), 'MMM d, yyyy')}</span>
                                                 </div>
                                                 {gen.status === 'completed' && gen.video_url ? (
-                                                    <Button
-                                                        onClick={() => {
-                                                            const a = document.createElement('a');
-                                                            a.href = gen.video_url;
-                                                            a.download = `video-${gen.id}.mp4`;
-                                                            a.click();
-                                                        }}
-                                                        size="sm"
-                                                        className="w-full bg-purple-500 hover:bg-purple-600"
-                                                    >
-                                                        Download
-                                                    </Button>
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            onClick={() => setPreviewVideo(gen)}
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="flex-1 border-white/20 text-white hover:bg-white/10"
+                                                        >
+                                                            Preview
+                                                        </Button>
+                                                        <Button
+                                                            onClick={() => {
+                                                                const a = document.createElement('a');
+                                                                a.href = gen.video_url;
+                                                                a.download = `video-${gen.id}.mp4`;
+                                                                a.click();
+                                                            }}
+                                                            size="sm"
+                                                            className="flex-1 bg-purple-500 hover:bg-purple-600"
+                                                        >
+                                                            Download
+                                                        </Button>
+                                                    </div>
                                                 ) : gen.status === 'processing' ? (
                                                     <div className="text-center text-white/60 text-sm py-2">
                                                         Processing...

@@ -256,6 +256,14 @@ Deno.serve(async (req) => {
                 } else {
                     // Still processing
                     console.log('[DEBUG] Video still processing, progress:', videoJob.progress);
+                    
+                    // Update progress in database
+                    if (videoJob.progress) {
+                        await base44.asServiceRole.entities.VideoGeneration.update(generationId, {
+                            progress: videoJob.progress
+                        });
+                    }
+                    
                     return Response.json({
                         status: 'processing',
                         progress: videoJob.progress || 0
