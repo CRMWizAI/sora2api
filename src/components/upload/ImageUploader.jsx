@@ -39,55 +39,88 @@ export default function ImageUploader({ onImageUploaded, aspectRatio }) {
 
     const resizeImage = (file) => {
         return new Promise((resolve, reject) => {
+            console.log('[RESIZE] Starting image resize process');
+            console.log('[RESIZE] File type:', file.type, 'Size:', file.size);
+            console.log('[RESIZE] Target aspect ratio:', aspectRatio);
+            
             const reader = new FileReader();
+            
             reader.onload = (e) => {
+                console.log('[RESIZE] File read complete, creating image');
                 const img = new Image();
+                
                 img.onload = () => {
-                    // Calculate target dimensions based on aspect ratio
-                    const targetWidth = aspectRatio === '16:9' ? 1280 : 720;
-                    const targetHeight = aspectRatio === '16:9' ? 720 : 1280;
+                    try {
+                        // Calculate target dimensions based on aspect ratio
+                        const targetWidth = aspectRatio === '16:9' ? 1280 : 720;
+                        const targetHeight = aspectRatio === '16:9' ? 720 : 1280;
 
-                    console.log('[DEBUG] Original image:', img.width, 'x', img.height);
-                    console.log('[DEBUG] Target dimensions:', targetWidth, 'x', targetHeight);
+                        console.log('[RESIZE] Original image:', img.width, 'x', img.height);
+                        console.log('[RESIZE] Target dimensions:', targetWidth, 'x', targetHeight);
 
-                    // Create canvas with target dimensions
-                    const canvas = document.createElement('canvas');
-                    canvas.width = targetWidth;
-                    canvas.height = targetHeight;
-                    const ctx = canvas.getContext('2d');
+                        // Create canvas with target dimensions
+                        const canvas = document.createElement('canvas');
+                        canvas.width = targetWidth;
+                        canvas.height = targetHeight;
+                        const ctx = canvas.getContext('2d');
 
-                    // Calculate scaling to cover the entire canvas
-                    const scale = Math.max(targetWidth / img.width, targetHeight / img.height);
-                    const scaledWidth = img.width * scale;
-                    const scaledHeight = img.height * scale;
-
-                    // Center the image
-                    const x = (targetWidth - scaledWidth) / 2;
-                    const y = (targetHeight - scaledHeight) / 2;
-
-                    // Draw and crop
-                    ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-
-                    console.log('[DEBUG] Resized to:', targetWidth, 'x', targetHeight);
-
-                    // Convert to blob
-                    canvas.toBlob((blob) => {
-                        if (blob) {
-                            resolve(blob);
-                        } else {
-                            reject(new Error('Failed to create blob'));
+                        if (!ctx) {
+                            throw new Error('Failed to get canvas context');
                         }
-                    }, 'image/jpeg', 0.95);
+
+                        // Calculate scaling to cover the entire canvas
+                        const scale = Math.max(targetWidth / img.width, targetHeight / img.height);
+                        const scaledWidth = img.width * scale;
+                        const scaledHeight = img.height * scale;
+
+                        // Center the image
+                        const x = (targetWidth - scaledWidth) / 2;
+                        const y = (targetHeight - scaledHeight) / 2;
+
+                        console.log('[RESIZE] Scale:', scale, 'Scaled dimensions:', scaledWidth, 'x', scaledHeight);
+                        console.log('[RESIZE] Position:', x, y);
+
+                        // Draw and crop
+                        ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
+                        console.log('[RESIZE] Image drawn on canvas, converting to blob');
+
+                        // Convert to blob
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                console.log('[RESIZE] Blob created successfully, size:', blob.size);
+                                resolve(blob);
+                            } else {
+                                console.error('[RESIZE] Failed to create blob from canvas');
+                                reject(new Error('Failed to create blob from canvas'));
+                            }
+                        }, 'image/jpeg', 0.95);
+                    } catch (error) {
+                        console.error('[RESIZE] Error during canvas operations:', error);
+                        reject(error);
+                    }
                 };
-                img.onerror = () => reject(new Error('Failed to load image'));
+                
+                img.onerror = (error) => {
+                    console.error('[RESIZE] Failed to load image:', error);
+                    reject(new Error('Failed to load image for resizing'));
+                };
+                
                 img.src = e.target.result;
             };
-            reader.onerror = () => reject(new Error('Failed to read file'));
+            
+            reader.onerror = (error) => {
+                console.error('[RESIZE] FileReader error:', error);
+                reject(new Error('Failed to read image file'));
+            };
+            
             reader.readAsDataURL(file);
         });
     };
 
     const handleFile = async (file) => {
+        console.log('[UPLOAD] File selected:', file.name, file.type, file.size);
+        
         if (!file.type.startsWith('image/')) {
             alert('Please upload an image file (JPG, PNG)');
             return;
@@ -98,25 +131,33 @@ export default function ImageUploader({ onImageUploaded, aspectRatio }) {
             return;
         }
 
+        console.log('[UPLOAD] Starting resize with aspect ratio:', aspectRatio);
         setResizing(true);
+        
         try {
             // Resize the image to exact dimensions
+            console.log('[UPLOAD] Calling resizeImage...');
             const resizedBlob = await resizeImage(file);
+            console.log('[UPLOAD] Resize complete, creating preview');
             
             // Create preview
             const reader = new FileReader();
             reader.onload = (e) => {
+                console.log('[UPLOAD] Preview created');
                 setPreview(e.target.result);
             };
             reader.readAsDataURL(resizedBlob);
 
             // Upload resized image to server
+            console.log('[UPLOAD] Starting upload to server');
             setUploading(true);
             const { file_url } = await base44.integrations.Core.UploadFile({ file: resizedBlob });
+            console.log('[UPLOAD] Upload complete, URL:', file_url);
             onImageUploaded(file_url);
         } catch (error) {
-            console.error('Processing failed:', error);
-            alert('Failed to process image. Please try again.');
+            console.error('[UPLOAD] Processing failed:', error);
+            console.error('[UPLOAD] Error stack:', error.stack);
+            alert(`Failed to process image: ${error.message}`);
             setPreview(null);
         } finally {
             setResizing(false);
