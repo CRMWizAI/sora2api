@@ -380,6 +380,37 @@ export default function VideoGenerator() {
                         </div>
                     </TabsContent>
                 </Tabs>
+                
+                {/* Preview Modal */}
+                <Dialog open={!!previewVideo} onOpenChange={() => setPreviewVideo(null)}>
+                    <DialogContent className="max-w-4xl bg-slate-900 border-white/20">
+                        <DialogHeader>
+                            <DialogTitle className="text-white">Video Preview</DialogTitle>
+                        </DialogHeader>
+                        {previewVideo && (
+                            <div className="space-y-4">
+                                <div className="relative rounded-xl overflow-hidden bg-black">
+                                    <video
+                                        src={previewVideo.video_url}
+                                        controls
+                                        autoPlay
+                                        className="w-full h-auto max-h-[70vh]"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <p className="text-white/80 text-sm">
+                                        {previewVideo.prompt}
+                                    </p>
+                                    <div className="flex items-center gap-4 text-xs text-white/50">
+                                        <span>Aspect Ratio: {previewVideo.aspect_ratio}</span>
+                                        <span>Duration: {previewVideo.duration}s</span>
+                                        <span>Created: {format(new Date(previewVideo.created_date), 'MMM d, yyyy')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     );
