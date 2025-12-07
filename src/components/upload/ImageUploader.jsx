@@ -151,7 +151,12 @@ export default function ImageUploader({ onImageUploaded, aspectRatio }) {
             // Upload resized image to server
             console.log('[UPLOAD] Starting upload to server');
             setUploading(true);
-            const { file_url } = await base44.integrations.Core.UploadFile({ file: resizedBlob });
+            
+            // Convert blob to File object for upload
+            const resizedFile = new File([resizedBlob], 'resized-image.jpg', { type: 'image/jpeg' });
+            console.log('[UPLOAD] Created File object:', resizedFile.name, resizedFile.size);
+            
+            const { file_url } = await base44.integrations.Core.UploadFile({ file: resizedFile });
             console.log('[UPLOAD] Upload complete, URL:', file_url);
             onImageUploaded(file_url);
         } catch (error) {
