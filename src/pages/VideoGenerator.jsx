@@ -180,21 +180,39 @@ export default function VideoGenerator() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="grid md:grid-cols-2 gap-8"
+                                    className="space-y-8"
                                 >
-                                    {/* Left: Image Upload */}
+                                    {/* Step 1: Select Format First */}
                                     <div className="space-y-6">
                                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                                             <span className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-sm">1</span>
-                                            Upload Image
+                                            Select Video Format
                                         </h2>
-                                        <ImageUploader onImageUploaded={setImageUrl} />
+                                        <ConfigPanel
+                                            config={config}
+                                            onChange={setConfig}
+                                            onGenerate={handleGenerate}
+                                            disabled={!imageUrl}
+                                            showOnlyFormat={true}
+                                        />
                                     </div>
 
-                                    {/* Right: Configuration */}
+                                    {/* Step 2: Upload Image (only after format is selected) */}
                                     <div className="space-y-6">
                                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                                             <span className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-sm">2</span>
+                                            Upload Image
+                                        </h2>
+                                        <ImageUploader 
+                                            onImageUploaded={setImageUrl} 
+                                            aspectRatio={config.aspect_ratio}
+                                        />
+                                    </div>
+
+                                    {/* Step 3: Configure Rest */}
+                                    <div className="space-y-6">
+                                        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                                            <span className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-sm">3</span>
                                             Configure Video
                                         </h2>
                                         <ConfigPanel
@@ -202,6 +220,7 @@ export default function VideoGenerator() {
                                             onChange={setConfig}
                                             onGenerate={handleGenerate}
                                             disabled={!imageUrl}
+                                            showOnlyPrompt={true}
                                         />
                                     </div>
                                 </motion.div>

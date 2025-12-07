@@ -11,7 +11,7 @@ const aspectRatios = [
     { value: '9:16', label: 'Portrait', icon: Smartphone, desc: '720x1280' }
 ];
 
-export default function ConfigPanel({ config, onChange, onGenerate, disabled }) {
+export default function ConfigPanel({ config, onChange, onGenerate, disabled, showOnlyFormat, showOnlyPrompt }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -19,6 +19,7 @@ export default function ConfigPanel({ config, onChange, onGenerate, disabled }) 
             className="space-y-8"
         >
             {/* Prompt Input */}
+            {(!showOnlyFormat) && (
             <div className="space-y-3">
                 <Label className="text-white text-lg font-medium">
                     Describe Your Video
@@ -34,8 +35,10 @@ export default function ConfigPanel({ config, onChange, onGenerate, disabled }) 
                     Be detailed and descriptive for best results
                 </p>
             </div>
+            )}
 
             {/* Aspect Ratio Selection */}
+            {(!showOnlyPrompt) && (
             <div className="space-y-3">
                 <Label className="text-white text-lg font-medium">
                     Video Format
@@ -79,8 +82,10 @@ export default function ConfigPanel({ config, onChange, onGenerate, disabled }) 
                     })}
                 </div>
             </div>
+            )}
 
             {/* Duration Selection */}
+            {(!showOnlyFormat) && (
             <div className="space-y-3">
                 <Label className="text-white text-lg font-medium">
                     Duration
@@ -119,8 +124,10 @@ export default function ConfigPanel({ config, onChange, onGenerate, disabled }) 
                     })}
                 </div>
             </div>
+            )}
 
             {/* Generate Button */}
+            {(!showOnlyFormat) && (
             <Button
                 onClick={onGenerate}
                 disabled={disabled || !config.prompt.trim()}
@@ -129,6 +136,7 @@ export default function ConfigPanel({ config, onChange, onGenerate, disabled }) 
                 <Sparkles className="w-5 h-5 mr-2" />
                 Generate Video
             </Button>
+            )}
         </motion.div>
     );
 }
