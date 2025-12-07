@@ -48,20 +48,30 @@ Deno.serve(async (req) => {
                         throw new Error(`Failed to fetch image: ${imageResponse.status}`);
                     }
                     
-                    // Get content type from response
-                    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
-                    console.log('[DEBUG] Image content type:', contentType);
+                    // Determine MIME type from file extension in URL
+                    let mimeType = 'image/jpeg';
+                    let extension = 'jpg';
+                    
+                    const urlLower = image_url.toLowerCase();
+                    if (urlLower.endsWith('.png')) {
+                        mimeType = 'image/png';
+                        extension = 'png';
+                    } else if (urlLower.endsWith('.webp')) {
+                        mimeType = 'image/webp';
+                        extension = 'webp';
+                    } else if (urlLower.endsWith('.jpg') || urlLower.endsWith('.jpeg')) {
+                        mimeType = 'image/jpeg';
+                        extension = 'jpg';
+                    }
+                    
+                    console.log('[DEBUG] Detected MIME type from URL:', mimeType);
                     
                     const imageArrayBuffer = await imageResponse.arrayBuffer();
                     console.log('[DEBUG] Image fetched, size:', imageArrayBuffer.byteLength, 'bytes');
                     
                     // Create blob with proper MIME type
-                    const imageBlob = new Blob([imageArrayBuffer], { type: contentType });
+                    const imageBlob = new Blob([imageArrayBuffer], { type: mimeType });
                     console.log('[DEBUG] Created blob with type:', imageBlob.type);
-                    
-                    // Determine file extension
-                    const extension = contentType.includes('png') ? 'png' : 
-                                     contentType.includes('webp') ? 'webp' : 'jpg';
                     
                     formData.append('input_reference', imageBlob, `reference.${extension}`);
                 } catch (imageError) {
