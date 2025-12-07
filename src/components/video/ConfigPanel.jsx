@@ -7,9 +7,8 @@ import { Sparkles, Monitor, Smartphone, Square } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const aspectRatios = [
-    { value: '16:9', label: 'Landscape', icon: Monitor, desc: '1920x1080' },
-    { value: '9:16', label: 'Portrait', icon: Smartphone, desc: '1080x1920' },
-    { value: '1:1', label: 'Square', icon: Square, desc: '1080x1080' }
+    { value: '16:9', label: 'Landscape', icon: Monitor, desc: '1280x720' },
+    { value: '9:16', label: 'Portrait', icon: Smartphone, desc: '720x1280' }
 ];
 
 export default function ConfigPanel({ config, onChange, onGenerate, disabled }) {
@@ -41,7 +40,7 @@ export default function ConfigPanel({ config, onChange, onGenerate, disabled }) 
                 <Label className="text-white text-lg font-medium">
                     Video Format
                 </Label>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                     {aspectRatios.map((ratio) => {
                         const Icon = ratio.icon;
                         const isSelected = config.aspect_ratio === ratio.value;
@@ -84,20 +83,41 @@ export default function ConfigPanel({ config, onChange, onGenerate, disabled }) 
             {/* Duration Selection */}
             <div className="space-y-3">
                 <Label className="text-white text-lg font-medium">
-                    Duration (seconds)
+                    Duration
                 </Label>
-                <Input
-                    type="number"
-                    min="3"
-                    max="10"
-                    value={config.duration}
-                    onChange={(e) => onChange({ ...config, duration: parseInt(e.target.value) || 5 })}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                    disabled={disabled}
-                />
-                <p className="text-white/50 text-sm">
-                    Typical range: 3-10 seconds
-                </p>
+                <div className="grid grid-cols-2 gap-4">
+                    {[4, 8].map((seconds) => {
+                        const isSelected = config.duration === seconds;
+                        return (
+                            <button
+                                key={seconds}
+                                onClick={() => onChange({ ...config, duration: seconds })}
+                                disabled={disabled}
+                                className={`relative p-4 rounded-2xl border-2 transition-all ${
+                                    isSelected
+                                        ? 'border-purple-500 bg-purple-500/20'
+                                        : 'border-white/20 bg-white/5 hover:bg-white/10'
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            >
+                                <div className="text-center">
+                                    <div className={`text-2xl font-bold ${isSelected ? 'text-white' : 'text-white/80'}`}>
+                                        {seconds}s
+                                    </div>
+                                    <div className="text-sm text-white/50 mt-1">
+                                        {seconds} seconds
+                                    </div>
+                                </div>
+                                {isSelected && (
+                                    <motion.div
+                                        layoutId="selected-duration"
+                                        className="absolute inset-0 rounded-2xl border-2 border-purple-500"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Generate Button */}

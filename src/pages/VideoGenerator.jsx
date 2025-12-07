@@ -18,7 +18,7 @@ export default function VideoGenerator() {
     const [config, setConfig] = useState({
         prompt: '',
         aspect_ratio: '16:9',
-        duration: 5
+        duration: 4
     });
     const [generating, setGenerating] = useState(false);
     const [currentGeneration, setCurrentGeneration] = useState(null);
@@ -112,7 +112,7 @@ export default function VideoGenerator() {
         setConfig({
             prompt: '',
             aspect_ratio: '16:9',
-            duration: 5
+            duration: 4
         });
         setCurrentGeneration(null);
         setGenerating(false);

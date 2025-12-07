@@ -23,9 +23,8 @@ Deno.serve(async (req) => {
                 model: "sora-1.0-turbo",
                 prompt: prompt,
                 image: image_url,
-                size: aspect_ratio === "16:9" ? "1920x1080" : 
-                      aspect_ratio === "9:16" ? "1080x1920" : "1080x1080",
-                duration: duration || 5
+                size: aspect_ratio === "16:9" ? "1280x720" : "720x1280",
+                duration: duration || 4
             });
 
             // Create database record
@@ -33,7 +32,7 @@ Deno.serve(async (req) => {
                 image_url,
                 prompt,
                 aspect_ratio,
-                duration: duration || 5,
+                duration: duration || 4,
                 status: 'processing',
                 job_id: response.id
             });
